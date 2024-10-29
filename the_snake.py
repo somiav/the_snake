@@ -31,24 +31,32 @@ clock = pygame.time.Clock()
 
 
 class GameObject:
+    """Представляет игровой объект на экране."""
+
     def __init__(self, position=(0, 0), body_color=(255, 255, 255)):
         self.position = position
         self.body_color = body_color
 
     def draw(self, surface):
+        """отвечает за отрисовку"""
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(surface, self.body_color, rect)
 
 
 class Snake(GameObject):
+    """Представляет змею в игре."""
+
     def __init__(self):
-        super().__init__(position=(GRID_WIDTH // 2 * GRID_SIZE, GRID_HEIGHT // 2 * GRID_SIZE), body_color=GREEN)
+        super().__init__(
+            position=(GRID_WIDTH // 2 * GRID_SIZE,
+                      GRID_HEIGHT // 2 * GRID_SIZE),
+            body_color=GREEN)
         self.body = [self.position]
         self.length = 1
         self.direction = RIGHT
 
     def move(self):
-        # Обновляем позицию головы
+        """Функция движения."""
         new_head = (self.body[0][0] + self.direction[0] * GRID_SIZE,
                     self.body[0][1] + self.direction[1] * GRID_SIZE)
         # Если змея выходит за границы, появляется с другой стороны
@@ -58,45 +66,56 @@ class Snake(GameObject):
             self.body.pop()  # Удаляем последний сегмент, если длина превышает
 
     def update_direction(self, new_direction):
-        # Изменяем направление, если оно не противоположное
-        if (self.direction[0] + new_direction[0] != 0) or (self.direction[1] + new_direction[1] != 0):
+        """Изменяем направление."""
+        if (self.direction[0] + new_direction[0] != 0) or (
+                self.direction[1] + new_direction[1] != 0):
             self.direction = new_direction
 
     def grow(self):
+        """Рост змеи."""
         self.length += 1
 
     def draw(self, surface):
+        """Представляет отрисовку змеи в игре."""
         for segment in self.body:
             GameObject(segment, self.body_color).draw(surface)
 
     def check_collision(self):
+        """Столкновение с самим собой."""
         # Проверка на столкновение с самим собой
         return self.body[0] in self.body[1:]
 
     def get_head_position(self):
+        """Позиция головы."""
         return self.body[0]
 
     def reset(self):
+        """ресет"""
         self.body = [self.position]
         self.length = 1
         self.direction = RIGHT
 
     @property
-    def positions(self):  # Добавлено свойство positions
+    def positions(self):
+        """добавлено свойство."""  # Добавлено свойство positions
         return self.body
 
 
 class Apple(GameObject):
+    """Класс яблока."""
+
     def __init__(self):
         super().__init__(body_color=RED)
         self.position = self.randomize_position()
 
     def randomize_position(self):
+        """Рандомная позиция."""
         return (random.randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                 random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
 
 
 def handle_keys(snake):
+    """Управление змеей."""
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP]:
         snake.update_direction(UP)
@@ -109,6 +128,7 @@ def handle_keys(snake):
 
 
 def main():
+    """Главная функция."""
     snake = Snake()
     apple = Apple()
     running = True
